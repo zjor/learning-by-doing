@@ -1,16 +1,13 @@
 package com.github.zjor.lbd.model;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Geometry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -29,6 +26,8 @@ public class Event {
 
     private Date date;
 
-    @Type(type="org.hibernate.spatial.GeometryType")
-    private Point location;
+    @Column(columnDefinition = "Geometry")
+    @Type(type = "org.hibernate.spatial.GeometryType")
+    private Geometry location;
+
 }

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Version;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,9 @@ public class Person {
     private Long id;
 
     private String name;
+
+    @Version
+    private Integer version;
 
     public Person(String name) {
         this.name = name;

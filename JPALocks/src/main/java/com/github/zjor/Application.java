@@ -2,6 +2,7 @@ package com.github.zjor;
 
 import com.github.zjor.model.Person;
 import com.github.zjor.service.PersonService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Application {
 
     public static void main(String[] args) throws InterruptedException {
@@ -28,16 +30,16 @@ public class Application {
             service.tx(em -> {
                 Person local = service.get(person.getId());
 
+                em.lock(local, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                log.info("Lock acquired for John");
+                local.setName("John");
+                log.info("Name set to John; {}", person);
+
                 try {
                     barrier.await();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                em.lock(local, LockModeType.PESSIMISTIC_WRITE);
-
-                local.setName("John");
-
             });
             return null;
         });
@@ -45,16 +47,18 @@ public class Application {
         exec.submit(() -> {
             service.tx(em -> {
                 Person local = service.get(person.getId());
+                log.info("Seeing name: {}", person.getName());
+
+                em.lock(local, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                 try {
                     barrier.await();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                em.lock(local, LockModeType.PESSIMISTIC_WRITE);
-
+                log.info("Lock acquired for Steve");
                 local.setName("Steve");
+                log.info("Name set to Steve; {}", person);
             });
             return null;
         });
@@ -62,7 +66,7 @@ public class Application {
         exec.shutdown();
         exec.awaitTermination(5, TimeUnit.SECONDS);
 
-        System.out.println(service.get(person.getId()).getName());
+        System.out.println(service.get(person.getId()));
 
     }
 }

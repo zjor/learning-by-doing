@@ -19,5 +19,10 @@ public class App {
         service.greetingService("zjor");
 
         service.varArgs("Train", "Van1", "Van2", "Van3");
+
+        service.varArgs("Empty train");
+
+        service.throwError(false);
+        service.throwError(true);
     }
 }

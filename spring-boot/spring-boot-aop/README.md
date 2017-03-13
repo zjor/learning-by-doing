@@ -7,9 +7,6 @@ Sample Spring Boot AOP configuration used for logging.
  
 ## Issues
 
-- Use slf4j for logging
-- Standardise format of the log message
-- Support log levels
 - Provide easy configuration instructions
 - Test logging static methods
 

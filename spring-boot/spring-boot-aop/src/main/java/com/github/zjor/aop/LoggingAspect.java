@@ -7,7 +7,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Aspect
-@Component
 public class LoggingAspect {
 
     @Around("@annotation(logAnnotation)")

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,17 +22,23 @@ import java.util.stream.Stream;
 @Component
 public class LoggingAspect {
 
-    @Around("@annotation(Log)")
-    public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("@annotation(logAnnotation)")
+    public Object log(ProceedingJoinPoint joinPoint, Log logAnnotation) throws Throwable {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Log.Level level = signature.getMethod().getAnnotation(Log.class).level();
 
-        String args = zip(
-                Arrays.stream(signature.getParameterNames()),
-                Arrays.stream(joinPoint.getArgs()),
-                (name, value) -> name + ": " + stringify(value)
-        ).collect(Collectors.joining(", "));
+        Stream<Object> argStream = Arrays.stream(joinPoint.getArgs());
+        String args = Optional.ofNullable(signature.getParameterNames())
+                .map(names ->
+                        zip(
+                                Arrays.stream(signature.getParameterNames()),
+                                argStream,
+                                (name, value) ->
+                                        name + ": " + stringify(value))
+                                .collect(Collectors.joining(", ")))
+                .orElseGet(() ->
+                        argStream.map(LoggingAspect::stringify)
+                                .collect(Collectors.joining(", ")));
 
         Logger logger = LoggerFactory.getLogger(joinPoint.getTarget().getClass());
 
@@ -45,7 +52,7 @@ public class LoggingAspect {
                 message = MessageFormat.format("{0}({1}): {2}", signature.getName(), args, result);
             }
 
-            log(logger, message, level);
+            log(logger, message, logAnnotation.level());
 
             return result;
         } catch (Throwable t) {

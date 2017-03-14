@@ -7,6 +7,7 @@ Sample Spring Boot AOP configuration used for logging.
  
 ## Issues
 
+- Support annotated interface implementation 
 - Provide easy configuration instructions
 - Test logging static methods
 

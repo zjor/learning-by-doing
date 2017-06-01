@@ -1,0 +1,11 @@
+.App {
+  text-align: center;
+}
+
+.list {
+  margin: 12px;
+}
+
+.list:hover {
+  background-color: lightgrey;
+}

@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <security:global-method-security secured-annotations="enabled"/>
+
+    <security:http pattern="/static/**" security="none"/>
+    <security:http pattern="/" security="none"/>
+
+    <security:http pattern="/**" use-expressions="true" entry-point-ref="authenticationEntryPoint">
+        <security:intercept-url pattern="/backdoor" access="permitAll"/>
+        <security:custom-filter ref="authFilter" position="BASIC_AUTH_FILTER"/>
+
+        <security:csrf disabled="true"/>
+
+    </security:http>
+
+
+    <bean id="authenticationEntryPoint"
+          class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+
+    <bean id="authFilter" class="com.github.zjor.MyAuthFilter">
+        <constructor-arg value="/login"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+    </bean>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="authenticationProvider"/>
+    </security:authentication-manager>
+
+    <bean id="authenticationProvider" class="com.github.zjor.MyAuthenticationProvider"/>
+
+</beans>
